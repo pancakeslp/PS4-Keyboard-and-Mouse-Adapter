@@ -1,7 +1,5 @@
 # PS4 Keyboard and Mouse Adapter 
 
-## :rocket: Click --> [here](https://github.com/starshinata/PS4-Keyboard-and-Mouse-Adapter/releases/download/1.0.7/Setup.exe) <-- to Download!
-
 ## How to use
 
 1. Make sure you've enabled remote play from your PS4's settings menu. To do that:
@@ -14,6 +12,29 @@
 Do NOT plug your DS4 controller into your PC while using this tool. If it is plugged already, unplug it because it interferes with the device emulator.
 
 If you think something doesn't work or is not good enough, don't get too mad at me and create an issue [here](https://github.com/starshinata/PS4-Keyboard-and-Mouse-Adapter/issues/new/choose)
+
+
+## Setup
+visual studio 2019
+
+Workloads ?
+* .net Development
+* Windows and web develoment
+  (Specifically "ClickOnce Publishing Tools"
+
+## Build
+run ` build.sh `
+
+## Gotchas
+* "Could not copy \Squirrel.exe"
+you need to set "SquirrelToolsPath" in your project properties
+
+eg if you have your project as 'D:\workspace\pancakeslp\PS4-Keyboard-and-Mouse-Adapter\'
+
+then your squirrel tools will be at  'D:\workspace\pancakeslp\PS4-Keyboard-and-Mouse-Adapter\packages\squirrel.windows.1.9.1\tools'
+
+so then  ` SquirrelToolsPath = packages\squirrel.windows.1.9.1\tools `
+
 
 ## To-do list
 - Create and switch between multiple mapping profiles to make configuration easy when playing multiple games
