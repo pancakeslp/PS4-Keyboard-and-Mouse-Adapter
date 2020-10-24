@@ -9,7 +9,7 @@
         xmlns:controls="clr-namespace:PS4KeyboardAndMouseAdapter.UI.Controls"
         mc:Ignorable="d"
         Title="{Binding Title}"
-        Width="620" Height="520" ResizeMode="CanMinimize"
+        Width="620" Height="620" ResizeMode="CanMinimize"
         Activated="MainWindowView_OnActivated"
         Deactivated="MainWindowView_OnDeactivated">
 
@@ -33,43 +33,10 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="1*" />
             <RowDefinition Height="8.3*" />
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="4*" />
         </Grid.RowDefinitions>
-
-        <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Margin="0, 20, 0, 0" Visibility="Visible">
-            <ToggleButton IsChecked="{Binding IsCursorHideRequested, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0, 5, 0, 5"
-                          Height="30"
-                          HorizontalAlignment="Center"
-                          Background="Transparent"
-                          Click="OnMouseHideToggleButtonClicked">
-                <ToggleButton.Style>    
-                    <Style TargetType="{x:Type ToggleButton}">
-
-                        <Style.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="Foreground" Value="DarkSlateGray" />
-                                <Setter Property="Content" Value="  Mouse will now be hidden once you go back to RemotePlay  "/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter Property="Content" Value="  Hide mouse cursor in RemotePlay  "/>
-                                <Setter Property="Foreground" Value="WhiteSmoke" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="DarkSlateGray" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ToggleButton.Style>
-            </ToggleButton>
-
-            <TextBlock Text="Tip: You can press alt+tab to switch between windows once the mouse is hidden."
-                       HorizontalAlignment="Center"
-                       Foreground="WhiteSmoke" FontSize="10"/>
-        </StackPanel>
-
 
         <TextBlock x:Name="PressKeyText" Text="Press a key to map" Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
                    HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Crimson" Opacity="0"
@@ -188,8 +155,8 @@
         <Grid Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"  Visibility="Visible">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="5*"/>
                 </Grid.ColumnDefinitions>
                 <!-- -->
                 <!-- <controls:AnalogStickVisualizer Grid.Column="0" -->

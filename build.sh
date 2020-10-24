@@ -22,7 +22,6 @@ cleanup
 rm -rf $ARCHIVE_FILE
  
 
-
 MSBuild.exe PS4KeyboardAndMouseAdapter.sln -p:Configuration=Release
 
 

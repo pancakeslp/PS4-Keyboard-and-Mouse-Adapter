@@ -4,43 +4,81 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PS4KeyboardAndMouseAdapter.UI.Controls"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:controls="clr-namespace:PS4KeyboardAndMouseAdapter.UI.Controls"
+             xmlns:wpfspark="clr-namespace:WPFSpark;assembly=WPFSpark" 
              mc:Ignorable="d" 
-             d:DesignHeight="250" d:DesignWidth="400">
+             d:DesignHeight="300" d:DesignWidth="500">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="5*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="1*" />
+            <!-- row 0 -->
+            <RowDefinition />
+            <!-- row 1 -->
+            <RowDefinition />
+            <!-- row 2 -->
+            <RowDefinition />
+            <!-- row 3 -->
+            <RowDefinition />
+            <!-- row 4 -->
+            <RowDefinition />
         </Grid.RowDefinitions>
 
-        <local:RangeSlider x:Name="mouseDistanceRangeSlider"
-                           Description="Mouse distance range"
-                           Grid.Row="0"
-                           Minimum="0" 
-                           Maximum="{Binding MaxMouseDistance, ElementName=This}" 
-                           LowerValue="{Binding MouseDistanceMinRange, Mode=TwoWay, ElementName=This}"
-                           UpperValue="{Binding MouseDistanceMaxRange, Mode=TwoWay, ElementName=This}"/>
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0"
+            Foreground="WhiteSmoke"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Text="Hide mouse cursor in RemotePlay"/>
 
-         <local:RangeSlider x:Name="AnalogStickRangeSlider" 
-                            Description="Analog stick range (in %)" 
-                            Grid.Row="1" 
-                            Minimum="0"  
-                            Maximum="95"  
-                            LowerValue="{Binding AnalogStickLowerRange, Mode=TwoWay, ElementName=This}" 
-                            UpperValue="{Binding AnalogStickUpperRange, Mode=TwoWay, ElementName=This}"/> 
+        <!-- https://www.codeproject.com/Articles/1060961/WPFSpark-v -->
+        <wpfspark:ToggleSwitch
+            Grid.Row="0"
+            Grid.Column="5"
+            IsChecked="{Binding IsCursorHideRequested, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Height="30"
+            HorizontalAlignment="Right"
+            Style="{StaticResource {ComponentResourceKey ResourceId=ToggleSwitch.UWP.Dark.Style, TypeInTargetAssembly={x:Type wpfspark:ToggleSwitch}}}" 
+            VerticalAlignment="Center"/>
 
-         <local:SliderV Grid.Row="2" Description="Horizontal/Vertical ratio" 
-                        Minimum="0.1" Maximum="1" Value="{Binding HorizontalVerticalRatio, ElementName=This, Mode=TwoWay}" TickFrequency="0.1"/> 
-         
+        <TextBlock 
+            Grid.Row="1"
+            Grid.Column="0"
+            FontSize="10"
+            Foreground="WhiteSmoke"
+            HorizontalAlignment="Left"
+            Text="Tip: You can press alt+tab to switch between windows once the mouse is hidden."
+            VerticalAlignment="Center" />
 
-        <!-- <local:SliderV Grid.Row="3" Description="Deadzone (in %)" -->
-        <!--                Minimum="0" Maximum="100" Value="{Binding Deadzone, ElementName=This, Mode=TwoWay}" TickFrequency="1"/> -->
+        <controls:RangeSlider            
+            Grid.Row="2"
+            Description="Mouse distance range"
+            LowerValue="{Binding MouseDistanceMinRange, Mode=TwoWay, ElementName=This}"
+            Maximum="{Binding MaxMouseDistance, ElementName=This}" 
+            Minimum="0" 
+            UpperValue="{Binding MouseDistanceMaxRange, Mode=TwoWay, ElementName=This}"
+            x:Name="mouseDistanceRangeSlider"/>
+
+        <controls:RangeSlider 
+            Grid.Row="3" 
+            Description="Analog stick range (in %)" 
+            LowerValue="{Binding AnalogStickLowerRange, Mode=TwoWay, ElementName=This}" 
+            Minimum="0"  
+            Maximum="95"  
+            UpperValue="{Binding AnalogStickUpperRange, Mode=TwoWay, ElementName=This}"
+            x:Name="AnalogStickRangeSlider" />
+
+        <controls:SliderV
+            Grid.Row="4" 
+            Description="Horizontal/Vertical ratio" 
+            Minimum="0.1" 
+            Maximum="1" 
+            TickFrequency="0.1"
+            Value="{Binding HorizontalVerticalRatio, ElementName=This, Mode=TwoWay}"/>
+
     </Grid>
 </UserControl>

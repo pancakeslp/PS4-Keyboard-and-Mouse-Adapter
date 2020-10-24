@@ -42,7 +42,7 @@ namespace PS4KeyboardAndMouseAdapter
                         {
                             vm.SetMapping((VirtualKey) lastClickedButton.Tag, key);
                             lastClickedButton = null;
-                            hidePressKey();
+                            HidePressKey();
                             return;
                         }
                     }
@@ -50,7 +50,7 @@ namespace PS4KeyboardAndMouseAdapter
             }
         }
 
-        private void displayPressKey()
+        private void DisplayPressKey()
         {
             PressKeyText.Opacity = 0.7;
             JoystickImage.Opacity = LowOpacity;
@@ -62,7 +62,7 @@ namespace PS4KeyboardAndMouseAdapter
             }
         }
 
-        private void hidePressKey()
+        private void HidePressKey()
         {
             PressKeyText.Opacity = 0;
             JoystickImage.Opacity = 1;
@@ -78,7 +78,7 @@ namespace PS4KeyboardAndMouseAdapter
         {
             lastClickedButton = (Button)sender;
 
-            displayPressKey();
+            DisplayPressKey();
 
             var b = (Button) sender;
             //b.Content = vm.mappings[]

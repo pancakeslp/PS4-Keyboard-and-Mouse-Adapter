@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Numerics;
 using System.Reflection;
@@ -13,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using FlaUI.Core.AutomationElements;
-using FlaUI.Core.Logging;
 using FlaUI.UIA2;
 using Newtonsoft.Json;
 using PS4KeyboardAndMouseAdapter.Annotations;
@@ -54,8 +52,8 @@ namespace PS4KeyboardAndMouseAdapter
     public class MainViewModel : INotifyPropertyChanged
     {
         // Constants
-        private string TARGET_PROCESS_NAME = "RemotePlay";
-        private string INJECT_DLL_NAME = "PS4RemotePlayInjection.dll";
+        private readonly string TARGET_PROCESS_NAME = "RemotePlay";
+        private readonly string INJECT_DLL_NAME = "PS4RemotePlayInjection.dll";
 
         public DualShockState CurrentState { get; private set; }
         public bool EnableMouseInput { get; set; } = false;
@@ -164,33 +162,10 @@ namespace PS4KeyboardAndMouseAdapter
             return false;
         }
 
+        // constructor
+        // AKA init
         public MainViewModel()
         {
-            //var Mappings = Settings.Mappings;
-            //Mappings = new Dictionary<VirtualKey, Keyboard.Key>();
-            //Mappings.Add(VirtualKey.Left, Keyboard.Key.A);
-            //Mappings.Add(VirtualKey.Right, Keyboard.Key.D);
-            //Mappings.Add(VirtualKey.Up, Keyboard.Key.W);
-            //Mappings.Add(VirtualKey.Down, Keyboard.Key.S);
-            //Mappings.Add(VirtualKey.Triangle, Keyboard.Key.F);
-            //Mappings.Add(VirtualKey.Circle, Keyboard.Key.C);
-            //Mappings.Add(VirtualKey.Cross, Keyboard.Key.V);
-            //Mappings.Add(VirtualKey.Square, Keyboard.Key.R);
-            //Mappings.Add(VirtualKey.L1, Keyboard.Key.Q);
-            //Mappings.Add(VirtualKey.L2, Keyboard.Key.K);
-            //Mappings.Add(VirtualKey.L3, Keyboard.Key.LShift);
-            //Mappings.Add(VirtualKey.R1, Keyboard.Key.E);
-            //Mappings.Add(VirtualKey.R2, Keyboard.Key.J);
-            //Mappings.Add(VirtualKey.R3, Keyboard.Key.L);
-            //Mappings.Add(VirtualKey.Options, Keyboard.Key.O);
-            //Mappings.Add(VirtualKey.TouchButton, Keyboard.Key.M);
-            //Mappings.Add(VirtualKey.DPadUp, Keyboard.Key.Num1);
-            //Mappings.Add(VirtualKey.DPadLeft, Keyboard.Key.Num2);
-            //Mappings.Add(VirtualKey.DPadDown, Keyboard.Key.Num3);
-            //Mappings.Add(VirtualKey.DPadRight, Keyboard.Key.Num4);
-            //Settings.Mappings = Mappings;
-
-            //File.WriteAllText("mappings.json", JsonConvert.SerializeObject(Settings, Formatting.Indented));
 
             Injector.FindProcess(TARGET_PROCESS_NAME)?.Kill();
 
@@ -250,38 +225,8 @@ namespace PS4KeyboardAndMouseAdapter
             }
         }
 
-        public void Inject()
+        public void HandleKeyboardInput()
         {
-            Thread.Sleep(3100);
-            int remotePlayProcessId = Injector.Inject(TARGET_PROCESS_NAME, INJECT_DLL_NAME);
-            RemotePlayProcess = Process.GetProcessById(remotePlayProcessId);
-            RemotePlayProcess.EnableRaisingEvents = true;
-            RemotePlayProcess.Exited += (sender, args) => { Utility.ShowCursor(true); };
-
-            Injector.Callback += OnReceiveData;
-        }
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr SetCursor(IntPtr handle);
-
-        public void OnReceiveData(ref DualShockState state)
-        {
-            // if (!IsCursorHideRequested)
-            //     return;
-            //timer.Start();
-            //counter++;
-            //if (timer.ElapsedMilliseconds > 1000)
-            //{
-            //    Console.WriteLine("OnReceiveData is called " + counter + "times per second");
-            //    counter = 0;
-            //    timer.Restart();
-            //}
-            // Create the default state to modify
-            if (true)//CurrentState == null)
-            {
-                CurrentState = new DualShockState() { Battery = 255 };
-            }
-
             if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.Left]))
                 CurrentState.LX = 0;
 
@@ -342,15 +287,18 @@ namespace PS4KeyboardAndMouseAdapter
             if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadRight]))
                 CurrentState.DPad_Right = true;
 
+        }
+
+        public void HandleMouseInput()
+        {
             // Mouse Input
             var prevVal = EnableMouseInput;
             EnableMouseInput = IsCursorHideRequested && IsProcessInForeground(RemotePlayProcess);
             if (EnableMouseInput != prevVal)
                 Utility.ShowCursor(prevVal);
-
             if (EnableMouseInput)
             {
-                //ShowCursor(false);
+                Utility.ShowCursor(false);
 
                 // Left mouse
                 if (SFML.Window.Mouse.IsButtonPressed(Mouse.Button.Left))
@@ -369,7 +317,7 @@ namespace PS4KeyboardAndMouseAdapter
                 var direction = new Vector2(MouseDirection.X, MouseDirection.Y);
 
                 // Cap length to fit range.
-                var normalizedLength = Utility.mapcap(direction.Length(), 
+                var normalizedLength = Utility.mapcap(direction.Length(),
                     Settings.MouseDistanceLowerRange, Settings.MouseDistanceUpperRange,
                     Settings.AnalogStickLowerRange / 100f, Settings.AnalogStickUpperRange / 100f);
 
@@ -378,8 +326,8 @@ namespace PS4KeyboardAndMouseAdapter
                 direction.X *= (float)Settings.XYRatio;
                 direction = Vector2.Normalize(direction);
 
-                var scaledX = (byte)Utility.map(direction.X*normalizedLength, -1, 1, 0, 255);
-                var scaledY = (byte)Utility.map(direction.Y*normalizedLength, -1, 1, 0, 255);
+                var scaledX = (byte)Utility.map(direction.X * normalizedLength, -1, 1, 0, 255);
+                var scaledY = (byte)Utility.map(direction.Y * normalizedLength, -1, 1, 0, 255);
 
                 if (float.IsNaN(direction.X) && float.IsNaN(direction.Y))
                 {
@@ -400,6 +348,49 @@ namespace PS4KeyboardAndMouseAdapter
                 // Invoke callback
                 //OnMouseAxisChanged?.Invoke(scaledX, scaledY);
             }
+        }
+
+        public void Inject()
+        {
+            Thread.Sleep(3100);
+            int remotePlayProcessId = Injector.Inject(TARGET_PROCESS_NAME, INJECT_DLL_NAME);
+            RemotePlayProcess = Process.GetProcessById(remotePlayProcessId);
+            RemotePlayProcess.EnableRaisingEvents = true;
+            RemotePlayProcess.Exited += (sender, args) => { Utility.ShowCursor(true); };
+
+            Injector.Callback += OnReceiveData;
+        }
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetCursor(IntPtr handle);
+
+        public void OnReceiveData(ref DualShockState state)
+        {
+            // if (!IsCursorHideRequested)
+            //     return;
+            //timer.Start();
+            //counter++;
+            //if (timer.ElapsedMilliseconds > 1000)
+            //{
+            //    Console.WriteLine("OnReceiveData is called " + counter + "times per second");
+            //    counter = 0;
+            //    timer.Restart();
+            //}
+            // Create the default state to modify
+            if (true)//CurrentState == null)
+            {
+                CurrentState = new DualShockState() { Battery = 255 };
+            }
+
+            if (!IsProcessInForeground(RemotePlayProcess))
+            {
+                return;
+            }
+
+
+            HandleKeyboardInput();
+
+            HandleMouseInput();
 
             // Assign the state
             state = CurrentState;
