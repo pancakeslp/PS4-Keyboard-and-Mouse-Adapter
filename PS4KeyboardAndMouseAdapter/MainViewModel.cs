@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Numerics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -25,29 +23,6 @@ using Window = FlaUI.Core.AutomationElements.Window;
 
 namespace PS4KeyboardAndMouseAdapter
 {
-    public enum VirtualKey
-    {
-        Left,
-        Right,
-        Up,
-        Down,
-        Triangle,
-        Circle,
-        Cross,
-        Square,
-        L1,
-        L2,
-        L3,
-        R1,
-        R2,
-        R3,
-        Options,
-        TouchButton,
-        DPadLeft,
-        DPadRight,
-        DPadUp,
-        DPadDown,
-    }
 
     public class MainViewModel : INotifyPropertyChanged
     {
@@ -59,20 +34,6 @@ namespace PS4KeyboardAndMouseAdapter
         public bool EnableMouseInput { get; set; } = false;
         public Vector2i MouseDirection { get; set; }
         public UserSettings Settings { get; set; } = new UserSettings();
-
-        public class UserSettings
-        {
-            public Dictionary<VirtualKey, Keyboard.Key> Mappings { get; set; }
-
-            public double MouseDistanceLowerRange { get; set; } = 5;
-            public double MouseDistanceUpperRange { get; set; } = VideoMode.DesktopMode.Width / 20f;
-
-            public int AnalogStickLowerRange { get; set; } = 40;
-            public int AnalogStickUpperRange { get; set; } = 95;
-
-            public double MouseMaxDistance => VideoMode.DesktopMode.Width / 2f;
-            public double XYRatio { get; set; } = 0.6;
-        }
 
 
         public int AnalogX
@@ -95,72 +56,16 @@ namespace PS4KeyboardAndMouseAdapter
             }
         }
 
-        public Vector2i anchor { get; set; } = new Vector2i(900, 500);
+        public Vector2i Anchor { get; set; } = new Vector2i(900, 500);
         public Process RemotePlayProcess;
 
-        public string Title { get; set; } = "PS4 Keyboard&Mouse Adapter v" + GetAssemblyVersion();
+        public string Title { get; set; } = "PS4 Keyboard&Mouse Adapter - unoffical";
 
         public bool IsCursorHideRequested { get; set; }
 
-        public static string GetAssemblyVersion()
-        {
-            Version v = Assembly.GetExecutingAssembly().GetName().Version;
-            return $"{v.Major}.{v.Minor}.{v.Build}";
-        }
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
 
-        public void SetMapping(VirtualKey key, Keyboard.Key value)
-        {
-            Settings.Mappings[key] = value;
-            OnPropertyChanged(nameof(Settings));
-
-            string json = JsonConvert.SerializeObject(Settings, Formatting.Indented);
-            File.WriteAllText("mappings.json", json);
-        }
-
-        public Process RunRemotePlaySetup()
-        {
-            MessageBox.Show("In order to play, PS4 Remote Play is required. Do you want to install it now?",
-                "Install PS4 Remote play", MessageBoxButton.OK);
-            string installerName = "RemotePlayInstaller.exe";
-            using (var client = new WebClient())
-            {
-                client.DownloadFile("https://remoteplay.dl.playstation.net/remoteplay/module/win/RemotePlayInstaller.exe", installerName);
-            }
-
-            return Process.Start(installerName);
-        }
-
-        public bool OpenRemotePlay()
-        {
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-
-            var exeLocation = path + @"\Sony\PS Remote Play\RemotePlay.exe";
-
-            if (File.Exists(exeLocation))
-            {
-                Process.Start(exeLocation);
-                return true;
-            }
-
-            try
-            {
-                //TODO: hardcoded currently, so it doesn't work when OS is set to non-default system language.
-                var shortcutPath = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PS Remote Play.lnk";
-                IWshRuntimeLibrary.IWshShell wsh = new IWshRuntimeLibrary.WshShellClass();
-                IWshRuntimeLibrary.IWshShortcut sc = (IWshRuntimeLibrary.IWshShortcut) wsh.CreateShortcut(shortcutPath);
-                shortcutPath = sc.TargetPath;
-                if (string.IsNullOrEmpty(shortcutPath))
-                    return false;
-                Process.Start(shortcutPath);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Log.Logger.Error("Cannot open RemotePlay: " + e.Message);
-            }
-
-            return false;
-        }
 
         // constructor
         // AKA init
@@ -227,18 +132,46 @@ namespace PS4KeyboardAndMouseAdapter
 
         public void HandleKeyboardInput()
         {
-            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.Left]))
+            //left stick
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.LeftStickLeft]))
                 CurrentState.LX = 0;
 
-            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.Right]))
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.LeftStickRight]))
                 CurrentState.LX = 255;
 
-            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.Up]))
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.LeftStickUp]))
                 CurrentState.LY = 0;
 
-            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.Down]))
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.LeftStickDown]))
                 CurrentState.LY = 255;
 
+            //right stick
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.RightStickLeft]))
+                CurrentState.RX = 0;
+
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.RightStickRight]))
+                CurrentState.RX = 255;
+
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.RightStickUp]))
+                CurrentState.RY = 0;
+
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.RightStickDown]))
+                CurrentState.RY = 255;
+
+            //left face
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadUp]))
+                CurrentState.DPad_Up = true;
+
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadLeft]))
+                CurrentState.DPad_Left = true;
+
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadDown]))
+                CurrentState.DPad_Down = true;
+
+            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadRight]))
+                CurrentState.DPad_Right = true;
+
+            //right face
             if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.Triangle]))
                 CurrentState.Triangle = true;
 
@@ -250,6 +183,7 @@ namespace PS4KeyboardAndMouseAdapter
 
             if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.Square]))
                 CurrentState.Square = true;
+
 
             if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.Options]))
                 CurrentState.Options = true;
@@ -275,17 +209,7 @@ namespace PS4KeyboardAndMouseAdapter
             if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.TouchButton]))
                 CurrentState.TouchButton = true;
 
-            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadUp]))
-                CurrentState.DPad_Up = true;
 
-            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadLeft]))
-                CurrentState.DPad_Left = true;
-
-            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadDown]))
-                CurrentState.DPad_Down = true;
-
-            if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.DPadRight]))
-                CurrentState.DPad_Right = true;
 
         }
 
@@ -300,15 +224,15 @@ namespace PS4KeyboardAndMouseAdapter
             {
                 Utility.ShowCursor(false);
 
-                // Left mouse
+                // Left mouse button
                 if (SFML.Window.Mouse.IsButtonPressed(Mouse.Button.Left))
                     CurrentState.R2 = 255;
 
-                // Right mouse
+                // Right mouse button
                 if (SFML.Window.Mouse.IsButtonPressed(Mouse.Button.Right))
                     CurrentState.L2 = 255;
 
-                // Middle mouse
+                // Middle mouse button
                 if (SFML.Window.Mouse.IsButtonPressed(Mouse.Button.Middle))
                     CurrentState.R3 = true;
 
@@ -335,7 +259,12 @@ namespace PS4KeyboardAndMouseAdapter
                     scaledY = 128;
                 }
 
-                // Set the analog values
+
+                // TODO if process mouse for left stick
+                //CurrentState.LX = scaledX;
+                //CurrentState.LY = scaledY;
+
+                // right stick
                 CurrentState.RX = scaledX;
                 CurrentState.RY = scaledY;
 
@@ -396,6 +325,40 @@ namespace PS4KeyboardAndMouseAdapter
             state = CurrentState;
         }
 
+        public bool OpenRemotePlay()
+        {
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
+            var exeLocation = path + @"\Sony\PS Remote Play\RemotePlay.exe";
+
+            if (File.Exists(exeLocation))
+            {
+                Process.Start(exeLocation);
+                return true;
+            }
+
+            try
+            {
+                //TODO: hardcoded currently, so it doesn't work when OS is set to non-default system language.
+                var shortcutPath = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PS Remote Play.lnk";
+                IWshRuntimeLibrary.IWshShell wsh = new IWshRuntimeLibrary.WshShellClass();
+                IWshRuntimeLibrary.IWshShortcut sc = (IWshRuntimeLibrary.IWshShortcut)wsh.CreateShortcut(shortcutPath);
+                shortcutPath = sc.TargetPath;
+
+                if (string.IsNullOrEmpty(shortcutPath))
+                    return false;
+
+                Process.Start(shortcutPath);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log.Logger.Error("Cannot open RemotePlay: " + e.Message);
+            }
+
+            return false;
+        }
+
         private readonly Stopwatch mouseTimer = new Stopwatch();
         private Vector2i mouseDirection = new Vector2i(0, 0);
         private int analogX;
@@ -405,20 +368,42 @@ namespace PS4KeyboardAndMouseAdapter
         {
             mouseTimer.Start();
 
+            // if more that 1 frame at 30fps
             if (mouseTimer.ElapsedMilliseconds >= 33)
             {
                 Vector2i currentMousePosition = Mouse.GetPosition();
-                mouseDirection = currentMousePosition - anchor;
-                Mouse.SetPosition(anchor);
+                mouseDirection = currentMousePosition - Anchor;
+                Mouse.SetPosition(Anchor);
                 mouseTimer.Restart();
             }
 
             return mouseDirection;
         }
 
-        [DllImport("user32.dll")]
-        static extern IntPtr GetForegroundWindow();
+        public void SetMapping(VirtualKey key, Keyboard.Key value)
+        {
+            Settings.Mappings[key] = value;
+            OnPropertyChanged(nameof(Settings));
 
+            string json = JsonConvert.SerializeObject(Settings, Formatting.Indented);
+            File.WriteAllText("mappings.json", json);
+        }
+
+        public Process RunRemotePlaySetup()
+        {
+            MessageBox.Show("In order to play, PS4 Remote Play is required. Do you want to install it now?",
+                "Install PS4 Remote play", MessageBoxButton.OK);
+
+            string installerName = "RemotePlayInstaller.exe";
+            
+            using (var client = new WebClient())
+            {
+                client.DownloadFile("https://remoteplay.dl.playstation.net/remoteplay/module/win/RemotePlayInstaller.exe", installerName);
+            }
+
+            return Process.Start(installerName);
+        }
+        
         public static bool IsProcessInForeground(Process process)
         {
             if (process == null)
