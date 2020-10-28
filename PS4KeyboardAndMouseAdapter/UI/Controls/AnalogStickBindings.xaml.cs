@@ -4,15 +4,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Button = System.Windows.Controls.Button;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace PS4KeyboardAndMouseAdapter.UI.Controls
 {
 
     public partial class AnalogStickBindings : UserControl
     {
-
-        private UserSettings Settings;
 
         private MainWindowView mwv;
 
@@ -30,47 +27,40 @@ namespace PS4KeyboardAndMouseAdapter.UI.Controls
         public AnalogStickBindings()
         {
             InitializeComponent();
-            Settings = UserSettingsManager.ReadUserSettings();
         }
 
-        private void fixButtons()
+        private void InitializeButtons()
         {
-            fixButton("buttonDown");
-            fixButton("buttonL3R3");
-            fixButton("buttonLeft");
-            fixButton("buttonRight");
-            fixButton("buttonUp");
+            InitializeButton("buttonDown");
+            InitializeButton("buttonL3R3");
+            InitializeButton("buttonLeft");
+            InitializeButton("buttonRight");
+            InitializeButton("buttonUp");
         }
 
-        private void fixButton(string buttonName)
+        private void InitializeButton(string buttonName)
         {
-            Console.WriteLine("buttonName" + buttonName);
             Button button = FindName(buttonName) as Button;
-            Console.WriteLine("button" + button);
             if (button != null)
             {
-                VirtualKey virtualKey = GetVirtualKey2(button);
+                VirtualKey virtualKey = GetVirtualKey(button);
 
                 button.Tag = virtualKey;
-                Binding dataBinding = new Binding("Settings.Mappings["+virtualKey+"]");
+                Binding dataBinding = new Binding("Settings.Mappings[" + virtualKey + "]");
                 button.SetBinding(ContentProperty, dataBinding);
             }
         }
 
-        public VirtualKey GetVirtualKey2(Button button)
+        public VirtualKey GetVirtualKey(Button button)
         {
-            Console.WriteLine("GetVirtualKey - ?" + button.Name);
-            Console.WriteLine("StickContext - " + StickContext);
 
-            if (button.Name == null)
+            if (button == null || button.Name == null)
             {
                 return VirtualKey.NULL;
             }
 
             if (StickContext == "LEFT")
             {
-                Console.WriteLine("GetVirtualKey - LEFT");
-                Log.Logger.Information("GetVirtualKey - LEFT");
                 if (button.Name == "buttonDown")
                     return VirtualKey.LeftStickDown;
 
@@ -89,8 +79,6 @@ namespace PS4KeyboardAndMouseAdapter.UI.Controls
             }
             else if (StickContext == "RIGHT")
             {
-                Console.WriteLine("GetVirtualKey - RIGHT");
-                Log.Logger.Information("GetVirtualKey - RIGHT");
 
                 if (button.Name == "buttonDown")
                     return VirtualKey.RightStickDown;
@@ -116,10 +104,7 @@ namespace PS4KeyboardAndMouseAdapter.UI.Controls
         {
             mwv = (MainWindowView)((Grid)((Grid)this.Parent).Parent).Parent;
 
-        
-
             Button button = (Button)sender;
-            button.Tag = GetVirtualKey2(button);
             mwv.lastClickedButton = button;
 
             mwv.WaitingForKeyPress_Show();
@@ -127,27 +112,8 @@ namespace PS4KeyboardAndMouseAdapter.UI.Controls
 
         private void Handler_ButtonLoaded(object sender, RoutedEventArgs e)
         {
-            fixButtons();
+            InitializeButtons();
         }
 
-        public void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            Console.WriteLine("listener in analog");
-
-            if (mwv != null)
-            {
-                mwv.OnKeyDown_Super(sender, e);
-            }
-
-
-            
-            if (mwv != null)
-                Settings = mwv.vm.Settings;
-
-            Settings = UserSettingsManager.ReadUserSettings();
-            fixButtons();
-        }
-
-   
     }
 }

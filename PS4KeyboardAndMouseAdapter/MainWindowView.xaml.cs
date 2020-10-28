@@ -37,7 +37,6 @@ namespace PS4KeyboardAndMouseAdapter
 
             if (lastClickedButton != null && lastClickedButton.Tag != null)
             {
-                Console.WriteLine("OnKeyDown_Super ...Tag - " + lastClickedButton.Tag);
 
                 foreach (var key in Enum.GetValues(typeof(Keyboard.Key)).Cast<Keyboard.Key>())
                 {
