@@ -133,21 +133,17 @@ namespace PS4KeyboardAndMouseAdapter.UI.Controls
         public void OnKeyDown(object sender, KeyEventArgs e)
         {
             Console.WriteLine("listener in analog");
-            bool handled = false;
+
             if (mwv != null)
             {
-                handled = mwv.OnKeyDown_Super(sender, e);
+                mwv.OnKeyDown_Super(sender, e);
             }
 
-            Console.WriteLine("handled" + handled);
-            Console.WriteLine("handled" + handled);
-            Console.WriteLine("handled" + handled);
-            Console.WriteLine("handled" + handled);
-            Console.WriteLine("handled" + handled);
-            Console.WriteLine("handled" + handled);
+
             
             if (mwv != null)
                 Settings = mwv.vm.Settings;
+
             Settings = UserSettingsManager.ReadUserSettings();
             fixButtons();
         }

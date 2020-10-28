@@ -26,18 +26,13 @@ namespace PS4KeyboardAndMouseAdapter
         {
             InitializeComponent();
             vm = (MainViewModel)DataContext;
-            this.KeyDown += OnKeyDownPrivate;
+            this.KeyDown += OnKeyDown_Super;
             WaitingForKeyPress_Hide();
         }
 
 
-        private void OnKeyDownPrivate(object sender, KeyEventArgs e)
-        {
-            Console.WriteLine("listener in MWV");
-            OnKeyDown_Super(sender, e);
-        }
 
-        public bool OnKeyDown_Super(object sender, KeyEventArgs e)
+        public void OnKeyDown_Super(object sender, KeyEventArgs e)
         {
 
             if (lastClickedButton != null && lastClickedButton.Tag != null)
@@ -51,21 +46,15 @@ namespace PS4KeyboardAndMouseAdapter
 
                         if (key != Keyboard.Key.Escape)
                         {
-                            e.Handled = false;
                             vm.SetMapping((VirtualKey)lastClickedButton.Tag, key);
-
                         }
-                        e.Handled = false;
 
                         lastClickedButton = null;
                         WaitingForKeyPress_Hide();
-                        return true;
-
                     }
                 }
 
             }
-            return false;
         }
 
         public void WaitingForKeyPress_Show()
