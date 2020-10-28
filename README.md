@@ -9,7 +9,7 @@
 3. If you want 0 lag, connect your PS4 to your TV or PC monitor and watch the game from there, not from the Remote Play app
 4. That's it 
 
-Do NOT plug your DS4 controller into your PC while using this tool. If it is plugged already, unplug it because it interferes with the device emulator.
+Do NOT plug your DS4 controller into your PC while using this tool. If it is plugged already, unplug it because it will interfere with the device emulation.
 
 If you think something doesn't work or is not good enough, don't get too mad at me and create an issue [here](https://github.com/starshinata/PS4-Keyboard-and-Mouse-Adapter/issues/new/choose)
 

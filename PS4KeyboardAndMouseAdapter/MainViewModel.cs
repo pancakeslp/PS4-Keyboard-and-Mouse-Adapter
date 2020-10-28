@@ -76,8 +76,7 @@ namespace PS4KeyboardAndMouseAdapter
 
             EventWaitHandle waitHandle = new ManualResetEvent(initialState: false);
 
-            string json = File.ReadAllText("mappings.json");
-            Settings = JsonConvert.DeserializeObject<UserSettings>(json);
+            Settings = UserSettingsManager.ReadUserSettings();
 
             bool success = OpenRemotePlay();
             if (!success)
@@ -386,8 +385,7 @@ namespace PS4KeyboardAndMouseAdapter
             Settings.Mappings[key] = value;
             OnPropertyChanged(nameof(Settings));
 
-            string json = JsonConvert.SerializeObject(Settings, Formatting.Indented);
-            File.WriteAllText("mappings.json", json);
+            UserSettingsManager.WriteUserSettings(Settings);
         }
 
         public Process RunRemotePlaySetup()

@@ -17,15 +17,14 @@
 
     <UserControl.Resources>
         <converters:KeyNameToSymbolConverter x:Key="KeyNameToSymbolConverter"/>
-        
-        <ps4adaper:MainViewModel  x:Key="mvm" />
 
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <EventSetter Event="Click" Handler="Handler_ButtonClicked" />
+            <EventSetter Event="Loaded" Handler="Handler_ButtonLoaded" />
         </Style>
     </UserControl.Resources>
 
-    <Grid DataContext="{Binding Source={StaticResource mvm}}"  >
+    <Grid>
         
         <Grid.RowDefinitions>
             <!-- row 0 -->
@@ -45,31 +44,30 @@
             
         </Grid.ColumnDefinitions>
 
+        <!-- reminder the below data bindings are done via the .xaml.xs file in fixButton method -->
+        
         <!-- row 0 -->
         <Button
             Grid.Row="0" Grid.Column="1" 
             x:Name="buttonUp" 
-            Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Left)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
             Padding="2"/>
 
-
+        
         <!-- row 1 -->
         <Button
             Grid.Row="1" Grid.Column="0"
             x:Name="buttonLeft" 
-            Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Left)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
             Padding="2"/>
 
         <Button 
             Grid.Row="1" Grid.Column="1" 
             x:Name="buttonDown" 
-            Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Down)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
+
             Padding="2"/>
 
         <Button 
             Grid.Row="1" Grid.Column="2" 
             x:Name="buttonRight" 
-            Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Right)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
             Padding="2"/>
 
 
@@ -80,7 +78,6 @@
         <Button 
             Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 
             x:Name="buttonL3R3"
-            Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.L3R3)], UpdateSourceTrigger=PropertyChanged}"
             Visibility="Visible"/>
        
     </Grid>

@@ -25,39 +25,47 @@ namespace PS4KeyboardAndMouseAdapter
         public MainWindowView()
         {
             InitializeComponent();
-            vm = (MainViewModel) DataContext;
-            this.KeyDown += OnKeyDown;
+            vm = (MainViewModel)DataContext;
+            this.KeyDown += OnKeyDownPrivate;
             WaitingForKeyPress_Hide();
         }
 
-        public void OnKeyDown(object sender, KeyEventArgs e)
+
+        private void OnKeyDownPrivate(object sender, KeyEventArgs e)
         {
-            
+            Console.WriteLine("listener in MWV");
+            OnKeyDown_Super(sender, e);
+        }
+
+        public bool OnKeyDown_Super(object sender, KeyEventArgs e)
+        {
+
             if (lastClickedButton != null && lastClickedButton.Tag != null)
             {
-                Console.WriteLine("lastClickedButton.Tag - " + lastClickedButton.Tag);
+                Console.WriteLine("OnKeyDown_Super ...Tag - " + lastClickedButton.Tag);
 
-                while (true)
+                foreach (var key in Enum.GetValues(typeof(Keyboard.Key)).Cast<Keyboard.Key>())
                 {
-                    foreach (var key in Enum.GetValues(typeof(Keyboard.Key)).Cast<Keyboard.Key>())
+                    if (Keyboard.IsKeyPressed(key))
                     {
-                        if (Keyboard.IsKeyPressed(key)){
 
-                            if (key != Keyboard.Key.Escape)
-                            {
-                                vm.SetMapping((VirtualKey)lastClickedButton.Tag, key);
-                                
-                            }
-                            
-                                
-                            lastClickedButton = null;
-                            WaitingForKeyPress_Hide();
-                            return;
-                             
+                        if (key != Keyboard.Key.Escape)
+                        {
+                            e.Handled = false;
+                            vm.SetMapping((VirtualKey)lastClickedButton.Tag, key);
+
                         }
+                        e.Handled = false;
+
+                        lastClickedButton = null;
+                        WaitingForKeyPress_Hide();
+                        return true;
+
                     }
                 }
+
             }
+            return false;
         }
 
         public void WaitingForKeyPress_Show()

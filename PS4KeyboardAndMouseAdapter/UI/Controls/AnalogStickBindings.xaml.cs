@@ -2,12 +2,20 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using Button = System.Windows.Controls.Button;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+
 namespace PS4KeyboardAndMouseAdapter.UI.Controls
 {
 
     public partial class AnalogStickBindings : UserControl
     {
-        public MainViewModel vm;
+
+        private UserSettings Settings;
+
+        private MainWindowView mwv;
+
         public static readonly DependencyProperty StickContextProperty = DependencyProperty.Register(
                 "StickContext", typeof(string), typeof(AnalogStickBindings), new PropertyMetadata(default(string)));
 
@@ -17,55 +25,42 @@ namespace PS4KeyboardAndMouseAdapter.UI.Controls
             set => SetValue(StickContextProperty, value);
         }
 
-        public VirtualKey GetVirtualKey(AnalogStickActions stickAction)
+        ////////////////////////////////
+
+        public AnalogStickBindings()
         {
-            Log.Logger.Information("GetVirtualKey - ?" + stickAction);
-            
-            if (StickContext == "LEFT")
-            {
-                Log.Logger.Information("GetVirtualKey - LEFT" );
-                if (stickAction == AnalogStickActions.Down)
-                    return VirtualKey.LeftStickDown;
-
-                if (stickAction == AnalogStickActions.Left)
-                    return VirtualKey.LeftStickLeft;
-
-                if (stickAction == AnalogStickActions.Right)
-                    return VirtualKey.LeftStickRight;
-
-                if (stickAction == AnalogStickActions.Up)
-                    return VirtualKey.LeftStickUp;
-
-                if (stickAction == AnalogStickActions.L3R3)
-                    return VirtualKey.L3;
-
-            }
-            //  StickContext == "Right"
-            else
-            {
-                Log.Logger.Information("GetVirtualKey - RIGHT" );
-
-                if (stickAction == AnalogStickActions.Down)
-                    return VirtualKey.RightStickDown;
-
-                if (stickAction == AnalogStickActions.Left)
-                    return VirtualKey.RightStickLeft;
-
-                if (stickAction == AnalogStickActions.Right)
-                    return VirtualKey.RightStickRight;
-
-                if (stickAction == AnalogStickActions.Up)
-                    return VirtualKey.RightStickUp;
-
-                if (stickAction == AnalogStickActions.L3R3)
-                    return VirtualKey.R3;
-            }
-
-            return VirtualKey.NULL;
+            InitializeComponent();
+            Settings = UserSettingsManager.ReadUserSettings();
         }
+
+        private void fixButtons()
+        {
+            fixButton("buttonDown");
+            fixButton("buttonL3R3");
+            fixButton("buttonLeft");
+            fixButton("buttonRight");
+            fixButton("buttonUp");
+        }
+
+        private void fixButton(string buttonName)
+        {
+            Console.WriteLine("buttonName" + buttonName);
+            Button button = FindName(buttonName) as Button;
+            Console.WriteLine("button" + button);
+            if (button != null)
+            {
+                VirtualKey virtualKey = GetVirtualKey2(button);
+
+                button.Tag = virtualKey;
+                Binding dataBinding = new Binding("Settings.Mappings["+virtualKey+"]");
+                button.SetBinding(ContentProperty, dataBinding);
+            }
+        }
+
         public VirtualKey GetVirtualKey2(Button button)
         {
             Console.WriteLine("GetVirtualKey - ?" + button.Name);
+            Console.WriteLine("StickContext - " + StickContext);
 
             if (button.Name == null)
             {
@@ -99,7 +94,7 @@ namespace PS4KeyboardAndMouseAdapter.UI.Controls
 
                 if (button.Name == "buttonDown")
                     return VirtualKey.RightStickDown;
-                
+
                 if (button.Name == "buttonLeft")
                     return VirtualKey.RightStickLeft;
 
@@ -113,42 +108,50 @@ namespace PS4KeyboardAndMouseAdapter.UI.Controls
                     return VirtualKey.R3;
             }
 
+            // you should NEVER get this, if you do you fudged the code
             return VirtualKey.NULL;
         }
 
-        public void Handler_ButtonClicked(object sender, RoutedEventArgs e)
+        private void Handler_ButtonClicked(object sender, RoutedEventArgs e)
         {
+            mwv = (MainWindowView)((Grid)((Grid)this.Parent).Parent).Parent;
 
-            MainWindowView mwv = (MainWindowView)((Grid)((Grid)this.Parent).Parent).Parent;
+        
 
-            this.KeyDown += mwv.OnKeyDown;
-
-            Button button =  (Button)sender;
+            Button button = (Button)sender;
             button.Tag = GetVirtualKey2(button);
             mwv.lastClickedButton = button;
 
             mwv.WaitingForKeyPress_Show();
         }
-        
-        //public UserSettings Settings { get; set; } = new UserSettings();
-        
-        public AnalogStickBindings()
+
+        private void Handler_ButtonLoaded(object sender, RoutedEventArgs e)
         {
-            InitializeComponent();
-
-            vm = (MainViewModel)DataContext;
-
-
-
-            /*
-                        Settings = ((MainWindowView)((Grid)((Grid)this.Parent).Parent).Parent).vm.Settings;
-
-                        Log.Logger.Information("parent tri  " + ((MainWindowView)((Grid)((Grid)this.Parent).Parent).Parent).vm.Settings.Mappings[VirtualKey.Triangle]);
-
-
-                        Log.Logger.Information("Settings Triangle - '" + Settings.Mappings[VirtualKey.Triangle]);
-                        */
+            fixButtons();
         }
 
+        public void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            Console.WriteLine("listener in analog");
+            bool handled = false;
+            if (mwv != null)
+            {
+                handled = mwv.OnKeyDown_Super(sender, e);
+            }
+
+            Console.WriteLine("handled" + handled);
+            Console.WriteLine("handled" + handled);
+            Console.WriteLine("handled" + handled);
+            Console.WriteLine("handled" + handled);
+            Console.WriteLine("handled" + handled);
+            Console.WriteLine("handled" + handled);
+            
+            if (mwv != null)
+                Settings = mwv.vm.Settings;
+            Settings = UserSettingsManager.ReadUserSettings();
+            fixButtons();
+        }
+
+   
     }
 }
