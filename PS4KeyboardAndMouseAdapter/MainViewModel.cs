@@ -220,6 +220,7 @@ namespace PS4KeyboardAndMouseAdapter
             EnableMouseInput = IsCursorHideRequested && IsProcessInForeground(RemotePlayProcess);
             if (EnableMouseInput != prevVal)
                 Utility.ShowCursor(prevVal);
+
             if (EnableMouseInput)
             {
                 Utility.ShowCursor(false);

@@ -4,79 +4,85 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:controls="clr-namespace:PS4KeyboardAndMouseAdapter.UI.Controls"
+             xmlns:converters="clr-namespace:PS4KeyboardAndMouseAdapter.UI.Converters"
              xmlns:ps4adaper="clr-namespace:PS4KeyboardAndMouseAdapter"
-             xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
-             xmlns:wpfspark="clr-namespace:WPFSpark;assembly=WPFSpark" 
              mc:Ignorable="d" 
              d:DesignHeight="160" d:DesignWidth="120">
-   
-    <Grid>
+
+    <!--
+    <UserControl.DataContext>
+        <ps4adaper:MainViewModel />
+    </UserControl.DataContext>
+    -->
+
+    <UserControl.Resources>
+        <converters:KeyNameToSymbolConverter x:Key="KeyNameToSymbolConverter"/>
+        
+        <ps4adaper:MainViewModel  x:Key="mvm" />
+
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <EventSetter Event="Click" Handler="Handler_ButtonClicked" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid DataContext="{Binding Source={StaticResource mvm}}"  >
         
         <Grid.RowDefinitions>
             <!-- row 0 -->
-            <RowDefinition />
+            <RowDefinition Height="1*" />
             <!-- row 1 -->
-            <RowDefinition />
+            <RowDefinition Height="1*" />
             <!-- row 2 -->
-            <RowDefinition />
+            <RowDefinition Height="1*" />
             <!-- row 3 -->
-            <RowDefinition />
-            <!-- row 4 -->
-            <RowDefinition />
+            <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
         
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
+            
         </Grid.ColumnDefinitions>
 
         <!-- row 0 -->
         <Button
             Grid.Row="0" Grid.Column="1" 
-            Tag="{x:Static ps4adaper:AnalogStickActions.Up}" 
-            Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Up)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
+            x:Name="buttonUp" 
+            Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Left)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
             Padding="2"/>
+
 
         <!-- row 1 -->
         <Button
             Grid.Row="1" Grid.Column="0"
-            Tag="{x:Static ps4adaper:AnalogStickActions.Left}" 
+            x:Name="buttonLeft" 
             Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Left)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
             Padding="2"/>
 
         <Button 
             Grid.Row="1" Grid.Column="1" 
-            Tag="{x:Static ps4adaper:AnalogStickActions.Down}" 
+            x:Name="buttonDown" 
             Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Down)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
             Padding="2"/>
 
         <Button 
             Grid.Row="1" Grid.Column="2" 
-            Tag="{x:Static ps4adaper:AnalogStickActions.Right}" 
+            x:Name="buttonRight" 
             Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.Right)], Converter={StaticResource KeyNameToSymbolConverter}, UpdateSourceTrigger=PropertyChanged}" 
             Padding="2"/>
 
-        <!-- row 2 -->
-        <svgc:SvgViewbox Grid.Column="4" Grid.Row="11" Margin="-4, -5, -9, -2" Stretch="Uniform" 
-                             Source="pack://application:,,,/mouse-move.svg" />
-        
-        <!-- https://www.codeproject.com/Articles/1060961/WPFSpark-v -->
-        <wpfspark:ToggleSwitch
-            Grid.Row="0" Grid.Column="5"
-            IsChecked="{Binding IsCursorHideRequested, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            Height="30"
-            HorizontalAlignment="Right"
-            Style="{StaticResource {ComponentResourceKey ResourceId=ToggleSwitch.UWP.Dark.Style, TypeInTargetAssembly={x:Type wpfspark:ToggleSwitch}}}" 
-            VerticalAlignment="Center"/>
 
-        <!-- row 4 -->
+        <!-- row 2 -->
+        <!-- intentionnaly blank to allow spacing -->
+        
+        <!-- row 3 -->
         <Button 
-            Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2" 
-            Tag="{x:Static ps4adaper:AnalogStickActions.L3R3}" 
+            Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 
+            x:Name="buttonL3R3"
             Content="{Binding Path=Settings.Mappings[GetVirtualKey(ps4adaper:AnalogStickActions.L3R3)], UpdateSourceTrigger=PropertyChanged}"
             Visibility="Visible"/>
+       
     </Grid>
 
 </UserControl>
