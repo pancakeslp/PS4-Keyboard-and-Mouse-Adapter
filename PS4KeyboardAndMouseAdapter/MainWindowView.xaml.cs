@@ -24,10 +24,9 @@ namespace PS4KeyboardAndMouseAdapter
         {
             InitializeComponent();
             vm = (MainViewModel)DataContext;
-            this.KeyDown += OnKeyDown_Super;
+            KeyDown += OnKeyDown_Super;
             WaitingForKeyPress_Hide();
         }
-
 
 
         public void OnKeyDown_Super(object sender, KeyEventArgs e)

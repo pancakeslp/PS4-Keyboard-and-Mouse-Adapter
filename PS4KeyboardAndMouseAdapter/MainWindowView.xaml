@@ -9,7 +9,7 @@
         xmlns:controls="clr-namespace:PS4KeyboardAndMouseAdapter.UI.Controls" xmlns:wpfspark="clr-namespace:WPFSpark;assembly=WPFSpark"
         mc:Ignorable="d"
         Title="{Binding Title}"
-        Width="700" Height="690" 
+        Width="700" Height="670" 
         Activated="MainWindowView_OnActivated"
         Deactivated="MainWindowView_OnDeactivated">
     <!-- ResizeMode="CanMinimize"    -->
@@ -34,7 +34,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="15px" />
-            <RowDefinition Height="385px" />
+            <RowDefinition Height="395px" />
             <RowDefinition Height="30px" />
             <RowDefinition Height="8*" />
         </Grid.RowDefinitions>
@@ -73,21 +73,25 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
+                <!-- 0 -->
                 <RowDefinition Height=".5*"/>
+                <!-- 1 -->
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
+                <!-- 5 -->
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
+                <!-- 10 -->
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
-                <RowDefinition Height="1*" />
+                <RowDefinition Height="32px" />
             </Grid.RowDefinitions>
 
             <Grid.Resources>
@@ -102,14 +106,13 @@
                 </Image.Source>
             </Image>
 
-            <Button Tag="{x:Static local:VirtualKey.TouchButton}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)TouchButton], UpdateSourceTrigger=PropertyChanged}"
-                    Grid.Column="1" Grid.Row="1" Visibility="Visible" Margin="0,0,0,25" Grid.RowSpan="2"/>
+            <!-- LEFT half of controller -->
 
             <Button Tag="{x:Static local:VirtualKey.L2}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)L2], UpdateSourceTrigger=PropertyChanged}"
                     Grid.Column="1" Grid.Row="2" Visibility="Visible" Margin="0,22,0,4" Grid.RowSpan="2"/>
 
-            <svgc:SvgViewbox Grid.Column="0" Grid.Row="2" Margin="-8, -5, -2, -2" Stretch="Uniform" 
-                             Source="pack://application:,,,/mouse-right-button.svg"/>
+            <svgc:SvgViewbox Grid.Column="0" Grid.Row="2" Margin="-12,22,2,25" Stretch="Uniform" 
+                             Source="pack://application:,,,/mouse-right-button.svg" Grid.RowSpan="3"/>
 
             <Button Tag="{x:Static local:VirtualKey.L1}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)L1], UpdateSourceTrigger=PropertyChanged}"
                     Grid.Column="1" Grid.Row="4" Visibility="Visible" Margin="0,2,0,27" Grid.RowSpan="2"/>
@@ -153,16 +156,27 @@
                 Stretch="Uniform" 
                 Source="pack://application:,,,/mouse-move.svg" Grid.RowSpan="2" />
 
+
+            <!-- MIDDLE of controller -->
+
+            <Button Tag="{x:Static local:VirtualKey.TouchButton}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)TouchButton], UpdateSourceTrigger=PropertyChanged}"
+                    Grid.Column="1" Grid.Row="1" Visibility="Visible" Margin="0,0,0,25" Grid.RowSpan="2"/>
+
             <Button Tag="{x:Static local:VirtualKey.Options}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)Options]}"
                     Grid.Column="3" Grid.Row="1" Visibility="Visible" Margin="0,0,0,25" Grid.RowSpan="2"/>
-            <svgc:SvgViewbox Grid.Column="4" Grid.Row="2" Margin="-2, -5, -8, -2" Stretch="Uniform" 
-                             Source="pack://application:,,,/mouse-left-button.svg" />
+
+
+            <!-- RIGHT half of controller -->
 
             <Button Tag="{x:Static local:VirtualKey.R2}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)R2]}"
                     Grid.Column="3" Grid.Row="2" Visibility="Visible" Margin="0,22,0,5" Grid.RowSpan="2"/>
 
+            <svgc:SvgViewbox Grid.Column="4" Grid.Row="2" Margin="2,22,-12,25" Stretch="Uniform" 
+                             Source="pack://application:,,,/mouse-left-button.svg" Grid.RowSpan="3" />
+
             <Button Tag="{x:Static local:VirtualKey.R1}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)R1]}"
                     Grid.Column="3" Grid.Row="4" Visibility="Visible"/>
+
             <Button Tag="{x:Static local:VirtualKey.Triangle}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)Triangle]}" 
                     Grid.Column="3" Grid.Row="6" Margin="0,6,0,0" />
             <Button Tag="{x:Static local:VirtualKey.Circle}" Content="{Binding Path=Settings.Mappings[(local:VirtualKey)Circle]}" 
@@ -195,7 +209,7 @@
                 Height="30"
                 HorizontalAlignment="Right"
                 Style="{StaticResource {ComponentResourceKey ResourceId=ToggleSwitch.UWP.Dark.Style, TypeInTargetAssembly={x:Type wpfspark:ToggleSwitch}}}" 
-                VerticalAlignment="Center" Margin="0,2,19,-4" Width="60"/>
+                VerticalAlignment="Center" Margin="0,4,18,-2" Width="60"/>
 
         </Grid>
 

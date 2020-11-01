@@ -239,7 +239,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AnalogStickActions.cs" />
     <Compile Include="Dll\Rect.cs" />
     <Compile Include="Dll\User32.cs" />
     <Compile Include="MouseAnchor.cs" />
@@ -383,9 +382,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ds4.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="test_layout.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ds4_final_layout.png" />
