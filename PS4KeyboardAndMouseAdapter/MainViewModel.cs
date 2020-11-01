@@ -5,19 +5,19 @@ using System.IO;
 using System.Net;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using FlaUI.Core.AutomationElements;
 using FlaUI.UIA2;
-using Newtonsoft.Json;
 using PS4KeyboardAndMouseAdapter.Annotations;
+using PS4KeyboardAndMouseAdapter.Dll;
 using PS4RemotePlayInjection;
 using PS4RemotePlayInterceptor;
 using Serilog;
 using SFML.System;
 using SFML.Window;
+
 using Application = FlaUI.Core.Application;
 using Window = FlaUI.Core.AutomationElements.Window;
 
@@ -56,21 +56,22 @@ namespace PS4KeyboardAndMouseAdapter
             }
         }
 
+        // Anchor is relative to the top left of the primary monitor
         public Vector2i Anchor { get; set; } = new Vector2i(900, 500);
+
         public Process RemotePlayProcess;
 
         public string Title { get; set; } = "PS4 Keyboard&Mouse Adapter - unoffical";
 
         public bool IsCursorHideRequested { get; set; }
 
-        [DllImport("user32.dll")]
-        static extern IntPtr GetForegroundWindow();
-
 
         // constructor
         // AKA init
         public MainViewModel()
         {
+            // cause not having a cursor is a pain in the ass
+            Utility.ShowCursor(true);
 
             Injector.FindProcess(TARGET_PROCESS_NAME)?.Kill();
 
@@ -207,10 +208,8 @@ namespace PS4KeyboardAndMouseAdapter
 
             if (Keyboard.IsKeyPressed(Settings.Mappings[VirtualKey.TouchButton]))
                 CurrentState.TouchButton = true;
-
-
-
         }
+
 
         public void HandleMouseInput()
         {
@@ -222,7 +221,22 @@ namespace PS4KeyboardAndMouseAdapter
 
             if (EnableMouseInput)
             {
-                Utility.ShowCursor(false);
+                HandleMouseCursor();
+                HandleMouseClick();
+            }
+        }
+
+        public void HandleMouseClick()
+        {
+            // Mouse Input
+            var prevVal = EnableMouseInput;
+            EnableMouseInput = IsCursorHideRequested && IsProcessInForeground(RemotePlayProcess);
+            if (EnableMouseInput != prevVal)
+                Utility.ShowCursor(prevVal);
+
+            if (EnableMouseInput)
+            {
+
 
                 // Left mouse button
                 if (SFML.Window.Mouse.IsButtonPressed(Mouse.Button.Left))
@@ -235,41 +249,84 @@ namespace PS4KeyboardAndMouseAdapter
                 // Middle mouse button
                 if (SFML.Window.Mouse.IsButtonPressed(Mouse.Button.Middle))
                     CurrentState.R3 = true;
+            }
+        }
 
+        public void HandleMouseCursor()
+        {
+            // Mouse Input
+            var prevVal = EnableMouseInput;
+            EnableMouseInput = IsCursorHideRequested && IsProcessInForeground(RemotePlayProcess);
+            if (EnableMouseInput != prevVal)
+                Utility.ShowCursor(prevVal);
+
+            if (EnableMouseInput)
+            {
+                Utility.ShowCursor(false);
+
+                // mouse displacement relative to the anchor
                 MouseDirection = FeedMouseCoords();
 
+                MouseDirection = new Vector2i((int)(MouseDirection.X * Settings.MouseXAxisSensitivityModifier), (int)(MouseDirection.Y * Settings.MouseYAxisSensitivityModifier));
                 var direction = new Vector2(MouseDirection.X, MouseDirection.Y);
 
                 // Cap length to fit range.
+
                 var normalizedLength = Utility.mapcap(direction.Length(),
                     Settings.MouseDistanceLowerRange, Settings.MouseDistanceUpperRange,
                     Settings.AnalogStickLowerRange / 100f, Settings.AnalogStickUpperRange / 100f);
+                //var normalizedLength = 1;
 
                 direction = Vector2.Normalize(direction);
 
-                direction.X *= (float)Settings.XYRatio;
-                direction = Vector2.Normalize(direction);
 
+                //direction.X *= (float)Settings.XYRatio;
+                //direction.X *= (float)Settings.XYRatio;
+
+                //direction.X *= (float)Settings.XYRatio;
+                //direction = Vector2.Normalize(direction);
+
+                // L3R3 center is 128, 
+                // full left is 0
+                // full right is 255
                 var scaledX = (byte)Utility.map(direction.X * normalizedLength, -1, 1, 0, 255);
                 var scaledY = (byte)Utility.map(direction.Y * normalizedLength, -1, 1, 0, 255);
 
                 if (float.IsNaN(direction.X) && float.IsNaN(direction.Y))
                 {
-                    scaledX = 128;
-                    scaledY = 128;
+                    scaledX = 127;
+                    scaledY = 127;
+                }
+
+                if( scaledX != 127  && scaledY != 127)
+                {
+                        Console.WriteLine("scaledX" + scaledX);
+                    Console.WriteLine("scaledY" + scaledY);
+
                 }
 
 
-                // TODO if process mouse for left stick
-                //CurrentState.LX = scaledX;
-                //CurrentState.LY = scaledY;
+                //4450 / 1750
+
+                if (Settings.MouseControlsL3)
+                {
+                    CurrentState.LX = scaledX;
+                    CurrentState.LY = scaledY;
+                }
 
                 // right stick
                 CurrentState.RX = scaledX;
                 CurrentState.RY = scaledY;
 
-                AnalogX = scaledX;
-                AnalogY = scaledY;
+                if (Settings.MouseControlsR3)
+                {
+                    CurrentState.RX = scaledX;
+                    CurrentState.RY = scaledY;
+                }
+
+
+                //AnalogX = scaledX;
+                //AnalogY = scaledY;
 
                 ///Console.WriteLine("{0:000}, {1:000}", scaledX, scaledY);
                 //if(scaledX != 128 && scaledY != 128) Console.WriteLine("{0}  {1}", MouseSpeedX, MouseSpeedY);
@@ -289,9 +346,6 @@ namespace PS4KeyboardAndMouseAdapter
 
             Injector.Callback += OnReceiveData;
         }
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr SetCursor(IntPtr handle);
 
         public void OnReceiveData(ref DualShockState state)
         {
@@ -313,9 +367,9 @@ namespace PS4KeyboardAndMouseAdapter
 
             if (!IsProcessInForeground(RemotePlayProcess))
             {
+                Utility.ShowCursor(true);
                 return;
             }
-
 
             HandleKeyboardInput();
 
@@ -368,11 +422,15 @@ namespace PS4KeyboardAndMouseAdapter
         {
             mouseTimer.Start();
 
-            // if more that 1 frame at 30fps
-            if (mouseTimer.ElapsedMilliseconds >= 33)
+
+            if (mouseTimer.ElapsedMilliseconds >= 16)
             {
                 Vector2i currentMousePosition = Mouse.GetPosition();
                 mouseDirection = currentMousePosition - Anchor;
+
+                //recalculate incase they moved the window
+                Anchor = MouseAnchor.CalculateAnchor();
+
                 Mouse.SetPosition(Anchor);
                 mouseTimer.Restart();
             }
@@ -394,7 +452,7 @@ namespace PS4KeyboardAndMouseAdapter
                 "Install PS4 Remote play", MessageBoxButton.OK);
 
             string installerName = "RemotePlayInstaller.exe";
-            
+
             using (var client = new WebClient())
             {
                 client.DownloadFile("https://remoteplay.dl.playstation.net/remoteplay/module/win/RemotePlayInstaller.exe", installerName);
@@ -402,17 +460,17 @@ namespace PS4KeyboardAndMouseAdapter
 
             return Process.Start(installerName);
         }
-        
+
         public static bool IsProcessInForeground(Process process)
         {
             if (process == null)
                 return false;
 
-            var activeWindow = GetForegroundWindow();
+            var activeWindow = User32.GetForegroundWindow();
 
             if (activeWindow == IntPtr.Zero)
                 return false;
-            
+
             if (activeWindow != process.MainWindowHandle)
                 return false;
 

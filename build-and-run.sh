@@ -16,4 +16,6 @@ set -e
 cp manualBuild/my-mappings.json zip-temp/Release/mappings.json
 cd zip-temp/Release/
 
+
+echo "EXECUTING ./PS4KeyboardAndMouseAdapter.exe"
 ./PS4KeyboardAndMouseAdapter.exe

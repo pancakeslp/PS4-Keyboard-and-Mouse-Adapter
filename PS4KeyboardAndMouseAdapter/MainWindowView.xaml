@@ -9,10 +9,10 @@
         xmlns:controls="clr-namespace:PS4KeyboardAndMouseAdapter.UI.Controls" xmlns:wpfspark="clr-namespace:WPFSpark;assembly=WPFSpark"
         mc:Ignorable="d"
         Title="{Binding Title}"
-        Width="700" Height="670" ResizeMode="CanMinimize"
+        Width="700" Height="690" 
         Activated="MainWindowView_OnActivated"
         Deactivated="MainWindowView_OnDeactivated">
-
+    <!-- ResizeMode="CanMinimize"    -->
     <Window.Style>
         <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}"/>
     </Window.Style>
@@ -34,7 +34,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="15px" />
-            <RowDefinition Height="16.6*" />
+            <RowDefinition Height="385px" />
             <RowDefinition Height="30px" />
             <RowDefinition Height="8*" />
         </Grid.RowDefinitions>
@@ -139,7 +139,7 @@
             <!-- https://www.codeproject.com/Articles/1060961/WPFSpark-v -->
             <wpfspark:ToggleSwitch
                 Grid.Row="14" 
-                IsChecked="{Binding IsCursorHideRequested, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsChecked="{Binding Path=Settings.MouseControlsL3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Height="30"
                 HorizontalAlignment="Right"
                 Style="{StaticResource {ComponentResourceKey ResourceId=ToggleSwitch.UWP.Dark.Style, TypeInTargetAssembly={x:Type wpfspark:ToggleSwitch}}}" 
@@ -191,7 +191,7 @@
             <!-- https://www.codeproject.com/Articles/1060961/WPFSpark-v -->
             <wpfspark:ToggleSwitch
                 Grid.Row="14" Grid.Column="3" 
-                IsChecked="{Binding IsCursorHideRequested, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsChecked="{Binding Path=Settings.MouseControlsR3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Height="30"
                 HorizontalAlignment="Right"
                 Style="{StaticResource {ComponentResourceKey ResourceId=ToggleSwitch.UWP.Dark.Style, TypeInTargetAssembly={x:Type wpfspark:ToggleSwitch}}}" 
@@ -211,14 +211,10 @@
             <!--                                 analogX="{Binding AnalogX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" -->
             <!--                                 analogY="{Binding AnalogY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/> -->
 
-            <controls:MouseSettingsControl MouseDistanceMinRange="{Binding Settings.MouseDistanceLowerRange, Mode=TwoWay}"
-                                               MouseDistanceMaxRange="{Binding Settings.MouseDistanceUpperRange, Mode=TwoWay}"
-                                               AnalogStickLowerRange="{Binding Settings.AnalogStickLowerRange, Mode=TwoWay}"
-                                               AnalogStickUpperRange="{Binding Settings.AnalogStickUpperRange, Mode=TwoWay}"
-                                               MaxMouseDistance="{Binding Settings.MouseMaxDistance}"
-                                               HorizontalVerticalRatio="{Binding Settings.XYRatio, Mode=TwoWay}" 
-                                               Margin="20, 10, 20, 10"
-                                               Grid.Column="1"/>
+            <controls:MouseSettingsControl
+                Grid.Column="1"
+                Margin="20, 10, 20, 10"
+                />
 
             <!--<Button Grid.Column="2" Content="Mouse Settings" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Padding="8, 3, 8, 3" Click="OnMouseSettingsButtonClick"/>-->

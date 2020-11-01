@@ -5,15 +5,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:converters="clr-namespace:PS4KeyboardAndMouseAdapter.UI.Converters"
-             xmlns:ps4adaper="clr-namespace:PS4KeyboardAndMouseAdapter"
              mc:Ignorable="d" 
              d:DesignHeight="160" d:DesignWidth="120">
-
-    <!--
-    <UserControl.DataContext>
-        <ps4adaper:MainViewModel />
-    </UserControl.DataContext>
-    -->
 
     <UserControl.Resources>
         <converters:KeyNameToSymbolConverter x:Key="KeyNameToSymbolConverter"/>
@@ -44,7 +37,7 @@
             
         </Grid.ColumnDefinitions>
 
-        <!-- reminder the below data bindings are done via the .xaml.xs file in fixButton method -->
+        <!-- reminder the below data bindings are done via the .xaml.cs file in fixButton method -->
         
         <!-- row 0 -->
         <Button

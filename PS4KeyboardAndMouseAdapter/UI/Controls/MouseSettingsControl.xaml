@@ -16,7 +16,7 @@
 
         <Grid.RowDefinitions>
             <!-- row 0 -->
-            <RowDefinition />
+            <RowDefinition Height="30px" />
             <!-- row 1 -->
             <RowDefinition />
             <!-- row 2 -->
@@ -24,6 +24,10 @@
             <!-- row 3 -->
             <RowDefinition />
             <!-- row 4 -->
+            <RowDefinition />
+            <!-- row 5-->
+            <RowDefinition />
+            <!-- row 6 -->
             <RowDefinition />
         </Grid.RowDefinitions>
 
@@ -39,8 +43,7 @@
         <wpfspark:ToggleSwitch
             Grid.Row="0"
             Grid.Column="5"
-            IsChecked="{Binding IsCursorHideRequested, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            Height="30"
+            IsChecked="{Binding Path=IsCursorHideRequested, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             HorizontalAlignment="Right"
             Style="{StaticResource {ComponentResourceKey ResourceId=ToggleSwitch.UWP.Dark.Style, TypeInTargetAssembly={x:Type wpfspark:ToggleSwitch}}}" 
             VerticalAlignment="Center"/>
@@ -54,31 +57,41 @@
             Text="Tip: You can press alt+tab to switch between windows once the mouse is hidden."
             VerticalAlignment="Center" />
 
-        <controls:RangeSlider            
+        <controls:SliderV
             Grid.Row="2"
+            Description="Mouse X axis sensitivity"
+            Minimum="0.1" 
+            Maximum="20" 
+            TickFrequency="0.1"
+            Value="{Binding Path=Settings.MouseXAxisSensitivityModifier, Mode=TwoWay,  UpdateSourceTrigger=PropertyChanged}"
+            />
+
+        <controls:SliderV
+            Grid.Row="3"
+            Description="Mouse Y axis sensitivity"
+            Minimum="0.1" 
+            Maximum="20" 
+            TickFrequency="0.1"
+            Value="{Binding Path=Settings.MouseYAxisSensitivityModifier, Mode=TwoWay,  UpdateSourceTrigger=PropertyChanged}"
+            />
+
+        <controls:RangeSlider            
+            Grid.Row="4"
             Description="Mouse distance range"
-            LowerValue="{Binding MouseDistanceMinRange, Mode=TwoWay, ElementName=This}"
-            Maximum="{Binding MaxMouseDistance, ElementName=This}" 
+            LowerValue="{Binding Path=Settings.MouseDistanceMinRange, Mode=TwoWay,  UpdateSourceTrigger=PropertyChanged}"
+            Maximum="{Binding Path=Settings.MaxMouseDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Minimum="0" 
-            UpperValue="{Binding MouseDistanceMaxRange, Mode=TwoWay, ElementName=This}"
+            UpperValue="{Binding Path=Settings.MouseDistanceMaxRange, Mode=TwoWay,  UpdateSourceTrigger=PropertyChanged}"
             x:Name="mouseDistanceRangeSlider"/>
 
         <controls:RangeSlider 
-            Grid.Row="3" 
+            Grid.Row="5" 
             Description="Analog stick range (in %)" 
-            LowerValue="{Binding AnalogStickLowerRange, Mode=TwoWay, ElementName=This}" 
+            LowerValue="{Binding Path=Settings.AnalogStickLowerRange, Mode=TwoWay,  UpdateSourceTrigger=PropertyChanged}"
             Minimum="0"  
             Maximum="95"  
-            UpperValue="{Binding AnalogStickUpperRange, Mode=TwoWay, ElementName=This}"
+            UpperValue="{Binding Path=Settings.AnalogStickUpperRange, Mode=TwoWay,  UpdateSourceTrigger=PropertyChanged}"
             x:Name="AnalogStickRangeSlider" />
-
-        <controls:SliderV
-            Grid.Row="4" 
-            Description="Horizontal/Vertical ratio" 
-            Minimum="0.1" 
-            Maximum="1" 
-            TickFrequency="0.1"
-            Value="{Binding HorizontalVerticalRatio, ElementName=This, Mode=TwoWay}"/>
 
     </Grid>
 </UserControl>

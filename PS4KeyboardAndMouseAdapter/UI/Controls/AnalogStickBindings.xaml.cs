@@ -1,6 +1,4 @@
-﻿using Serilog;
-using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Button = System.Windows.Controls.Button;

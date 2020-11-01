@@ -1,4 +1,6 @@
 {
+  "AnalogStickLowerRange": 41,
+  "AnalogStickUpperRange": 95,
   "Mappings": {
     "LeftStickLeft": 0,
     "LeftStickRight": 3,
@@ -26,9 +28,11 @@
     "DPadRight": 10
   },
   "MouseDistanceLowerRange": 0.0,
-  "MouseDistanceUpperRange": 140.8,
-  "AnalogStickLowerRange": 41,
-  "AnalogStickUpperRange": 95,
+  "MouseDistanceUpperRange": 170.8,
   "MouseMaxDistance": 960.0,
+  "MouseControlsL3": false,
+  "MouseControlsR3": true,
+  "MouseXAxisSensitivityModifier": 12.600000001490116,
+  "MouseYAxisSensitivityModifier": 9.7000000014901175,
   "XYRatio": 0.40000000149011616
 }
